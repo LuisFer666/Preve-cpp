@@ -16,6 +16,6 @@ g++ proyecto.cpp
 ./a
 ```
 
-3. Write the name of source code file then press ENTER. You can use [cosa.txt](#cosa.txt) or [prueba.txt](#prueba.txt) if you want
+3. Write the name of source code file then press ENTER. You can use [cosa.txt](/blob/master/cosa.txt) or [prueba.txt](/blob/master/prueba.txt) if you want
 
 4. Preve++ will compile and run your source code using our [language grammar](#2-Reglas-gramaticales)
