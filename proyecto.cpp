@@ -14,13 +14,15 @@ bool cadena = false;
 bool _str = false;
 string _string;
 
+map<string,int> transiciones[71];
+string errores[11];
+map<int, int> err_proceso;
 char simbolos[] = {' ', '\n', '(', ')', ';', '.', '{', '}'};
 string palabras[] = {"startPrevebot", "endPrevebot", "turn", "right", "left",
                     "straight", "stop", "wait", "back", "detect", "Door", "Battery",
                     "Colision", "openDoor", "closeDoor", "transport", "medicine", "cloth", "sample", "alert",
                     "clean", "lowBattery"};
 
-map<string,int> transiciones[71];
 
 int main () {
     set<string> dic_palabras;
@@ -37,6 +39,7 @@ int main () {
     }
     
     Utilidades::iniciarMapa(transiciones);
+    Utilidades::iniciarErrores(errores, err_proceso);
     
   char str[256];
 
@@ -80,7 +83,8 @@ int main () {
                   proceso = transiciones[proceso]["3"];
               }else
               {
-                  cout << "Conexion perdida " << aux << "\n";
+                  cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
+                  estado = 1;
               }
               
               aux = c;
@@ -90,7 +94,8 @@ int main () {
                       proceso = transiciones[proceso][aux];
                   }else
                   {
-                      cout << "Conexion perdida [" << aux << "]\n";
+                      cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
+                        estado = 1;
                 }
           }
       }else
@@ -99,7 +104,7 @@ int main () {
           {
               if(cadena) // Error de string
               {
-                  cout <<  "Fila: "<< fila << "|Pos:" << pos << "n La instruccion < " << aux << " > no existe\n";
+                  cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
                   estado = 1;
               }
               
@@ -110,7 +115,7 @@ int main () {
           {
               if(cadena) // Error de string
               {
-                  cout <<  "Fila: "<< fila << "|Pos:" << pos << "p La instruccion < " << aux << " > no existe\n";
+                  cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
                   estado = 1;
               }
               
@@ -122,7 +127,8 @@ int main () {
                   proceso = transiciones[proceso][aux];
               }else
               {
-                  cout << "Conexion perdida pal " << aux << "\n";
+                  cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
+                  estado = 1;
               }
               //cout << "Pal[" << aux << "]\n";
               aux = "";
@@ -137,7 +143,7 @@ int main () {
                   }else
                   {
                       _str = false;
-                      cout <<  "Fila: "<< fila << "|Pos:" << pos << "s La instruccion < " << aux << " > no existe\n";
+                      cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
                       estado = 1;
                   }
               }
@@ -160,7 +166,8 @@ int main () {
                       proceso = transiciones[proceso]["asd"];
                   }else
                   {
-                      cout << "Conexion perdida str1 " << aux << "\n";
+                      cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
+                      estado = 1;
                   }
               }else if(transiciones[proceso].count(aux)) // Transicion de simbolos
               {
@@ -168,7 +175,8 @@ int main () {
                   proceso = transiciones[proceso][aux];
               }else
               {
-                  cout << "Conexion perdida str2 " << aux << "\n";
+                  cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
+                  estado = 1;
               }
               
               if(_str)
@@ -179,7 +187,8 @@ int main () {
                       proceso = transiciones[proceso][aux];
                   }else
                   {
-                      cout << "Conexion perdida " << aux << "\n";
+                      cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
+                      estado = 1;
                   }
                   _str = false;
               }else
@@ -204,7 +213,8 @@ int main () {
                       proceso = transiciones[proceso][aux];
                   }else
                   {
-                      cout << "Conexion perdida " << aux << "\n";
+                      cout <<  "Fila: " << fila << "|Pos:" << pos << " "<< errores[err_proceso[proceso]] << ". Se encontro: '" << aux << "'\n";
+                      estado = 1;
                   }
                   
                   // cout << "Pal[" << aux << "]\n";
