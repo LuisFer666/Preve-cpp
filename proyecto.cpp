@@ -3,17 +3,24 @@
 #include <fstream>      // std::ifstream
 #include <string>
 #include <set>
+#include <map>
+
+#include "utilidades.cpp"
 
 using namespace std;
 
 bool num = false;
 bool cadena = false;
+bool _str = false;
+string _string;
 
 char simbolos[] = {' ', '\n', '(', ')', ';', '.', '{', '}'};
 string palabras[] = {"startPrevebot", "endPrevebot", "turn", "right", "left",
                     "straight", "stop", "wait", "back", "detect", "Door", "Battery",
-                    "Colision", "openDoor", "transport", "medicine", "cloth", "sample", "alert",
+                    "Colision", "openDoor", "closeDoor", "transport", "medicine", "cloth", "sample", "alert",
                     "clean", "lowBattery"};
+
+map<string,int> transiciones[71];
 
 int main () {
     set<string> dic_palabras;
@@ -29,6 +36,7 @@ int main () {
         dic_simbolos.insert(a);
     }
     
+    Utilidades::iniciarMapa(transiciones);
     
   char str[256];
 
@@ -37,28 +45,53 @@ int main () {
 
   ifstream is(str);     // open file
 
-  char c;
+    char c;
     string aux;
     string numero;
     int pos=1;
-    int col=1;
-    int estado = 0;
+    int fila=1;
+    int estado = 0; // 0 si no hay errores, 1 si hay errores
     int proceso=1;
+    
   while (is.get(c))          // loop getting single characters
   {
+      if(proceso == 26)
+      {
+          break;
+      }
       if(num)
       {
           if(c >= '0' && c <= '9') // Juntar numeros
           {
               num = true;
               cadena = false;
+              _str = false;
               aux += c;
           }else // Iniciar string
           {
               num = false;
-              cadena = true;
+              cadena = false;
+              _str = false;
               //cout << "Num["<< aux << "]\n";
+              
+              if(transiciones[proceso].count("3")) // Transiciones de numeros
+              {
+                  cout << aux << " "<< proceso << "->"<< transiciones[proceso]["3"] <<"\n";
+                  proceso = transiciones[proceso]["3"];
+              }else
+              {
+                  cout << "Conexion perdida " << aux << "\n";
+              }
+              
               aux = c;
+              if(transiciones[proceso].count(aux)) // Transicion de simbolos
+                  {
+                      cout << aux << " "<< proceso << "->"<< transiciones[proceso][aux] <<"\n";
+                      proceso = transiciones[proceso][aux];
+                  }else
+                  {
+                      cout << "Conexion perdida [" << aux << "]\n";
+                }
           }
       }else
       {
@@ -66,7 +99,7 @@ int main () {
           {
               if(cadena) // Error de string
               {
-                  cout <<  "Col: "<< col << "|Pos:" << pos << " La instruccion < " << aux << " > no existe\n";
+                  cout <<  "Fila: "<< fila << "|Pos:" << pos << "n La instruccion < " << aux << " > no existe\n";
                   estado = 1;
               }
               
@@ -77,32 +110,82 @@ int main () {
           {
               if(cadena) // Error de string
               {
-                  cout <<  "Col: "<< col << "|Pos:" << pos << " La instruccion < " << aux << " > no existe\n";
+                  cout <<  "Fila: "<< fila << "|Pos:" << pos << "p La instruccion < " << aux << " > no existe\n";
                   estado = 1;
               }
               
               num = false;
               cadena = false;
+              if(transiciones[proceso].count(aux)) // Transicion de palabras
+              {
+                  cout << aux << " "<< proceso << "->"<< transiciones[proceso][aux] <<"\n";
+                  proceso = transiciones[proceso][aux];
+              }else
+              {
+                  cout << "Conexion perdida pal " << aux << "\n";
+              }
               //cout << "Pal[" << aux << "]\n";
               aux = "";
           }else if(dic_simbolos.count(c)) // Simbolos
           {
               if(cadena) // Error de string
               {
-                  cout <<  "Col: "<< col << "|Pos:" << pos << " La instruccion < " << aux << " > no existe\n";
-                  estado = 1;
+                  if(aux[0] == '\"')
+                  {
+                      _str = true;
+                      _string = aux; // Guardar string para que no se pierda en la linea "aux = c"
+                  }else
+                  {
+                      _str = false;
+                      cout <<  "Fila: "<< fila << "|Pos:" << pos << "s La instruccion < " << aux << " > no existe\n";
+                      estado = 1;
+                  }
               }
               
               if(c == '\n')
               {
-                  col++;
+                  fila++;
                   pos = 1;
               }
               
               num = false;
               cadena = false;
               //cout << "Sim[" << c << "]\n";
-              aux = "";
+              aux = c;
+              if(_str)
+              {
+                  if(transiciones[proceso].count("asd")) // Transicion de strings
+                  {
+                      cout << _string << " "<< proceso << "->"<< transiciones[proceso]["asd"] <<"\n";
+                      proceso = transiciones[proceso]["asd"];
+                  }else
+                  {
+                      cout << "Conexion perdida str1 " << aux << "\n";
+                  }
+              }else if(transiciones[proceso].count(aux)) // Transicion de simbolos
+              {
+                  cout << aux << " "<< proceso << "->"<< transiciones[proceso][aux] <<"\n";
+                  proceso = transiciones[proceso][aux];
+              }else
+              {
+                  cout << "Conexion perdida str2 " << aux << "\n";
+              }
+              
+              if(_str)
+              {
+                  if(transiciones[proceso].count(aux)) // Transicion de simbolos
+                  {
+                      cout << aux << " "<< proceso << "->"<< transiciones[proceso][aux] <<"\n";
+                      proceso = transiciones[proceso][aux];
+                  }else
+                  {
+                      cout << "Conexion perdida " << aux << "\n";
+                  }
+                  _str = false;
+              }else
+              {
+                  aux = "";
+              }
           }else // Juntar strings
           {
               num = false;
@@ -114,6 +197,16 @@ int main () {
               {
                   num = false;
                   cadena = false;
+                  
+                  if(transiciones[proceso].count(aux)) // Transicion de palabras
+                  {
+                      cout << aux << " "<< proceso << "->"<< transiciones[proceso][aux] <<"\n";
+                      proceso = transiciones[proceso][aux];
+                  }else
+                  {
+                      cout << "Conexion perdida " << aux << "\n";
+                  }
+                  
                   // cout << "Pal[" << aux << "]\n";
                   aux = "";
               }

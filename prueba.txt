@@ -1,3 +1,6 @@
 startPrevebot{
-clean
-endPrevebot;
+detect.Door();
+transport.sample("Holi");
+detect.Battery();
+detect.Colision();
+endPrevebot;}
