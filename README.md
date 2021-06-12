@@ -1,6 +1,6 @@
 # Description
 
-Original programming language created only using C++
+Original programming language created using only C++
 
 # Compile & run
 
